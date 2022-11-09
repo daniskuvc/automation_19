@@ -1,11 +1,7 @@
 # Password Generator by Daniel Villarroel Chanlopkova
 # passgen v.1.0
 
-#password = "" # chars > 8 and chars <= 16
-              # at least one capital letter (ASDDFG)
-              # At least one number (0 - 9)
-              # at least one lower letter
-
+from io import open
 import random, re
 
 pass_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
@@ -79,7 +75,11 @@ while (True):
 
 
     elif main_menu_option =='3':
-        print("\nThanks for using this software. Bye!\n\n")
+        print("\nYour passwords list is beeing saved to a password.txt file.\nThanks for using this software. Bye!\n\n")
+        password_file=open("password.txt","w")
+        password_file.write(str(password_list))
+        password_file.close()
+
         break
     else:
         print("\nInvalid option. Please provide a number between 1 and 3.\n")    
