@@ -21,7 +21,7 @@ def password_generator(): #Returns a string with a randonmly generated password
 
 
 def main_menu(): #Displays main menu options and returns selected option
-    
+
     return input("""\n
     ---------------------------------
     Password Generator v2.0
@@ -47,7 +47,7 @@ def passfile_read():
         file = open(PATH_FILE,'r+')
         password_list = file.read()
         file.close()
-    print(password_list, "check")
+    #print(password_list, "check")
 
     return password_list
 
@@ -75,31 +75,54 @@ def passfile_overwrite(account_name, overwrite):
         file.close()
 
 
-
-
-
-
-def account_manager(account_name): # Saves account name and password 
+def password_exist(account_name):
     get_password = passfile_read()
     if get_password:
-        if account_name in get_password: # password existe
-            account_overwrite = input("\n-- The account name you entered already exist. --\nDo you want to overwrite the password? (y/n): ")
+        if account_name in get_password:
+            for p in get_password.splitlines():
+                if account_name in p:
+                    return p.split(":")[1]
+                    break
+    else:
+        return False
 
-            if account_overwrite.lower() == 'y':
-                passfile_overwrite(account_name, True)
-                print(f"\n-- The password for \"{account_name}\" account, was updated successfully. --")
-    
-            else:
-                print("-- Back to menu... --")
+def account_manager(account_name):
+    #print(password_exist(account_name))
+    password = password_exist(account_name)
+    if password: # existe password
+        account_overwrite = input("\n-- The account name you entered already exist. --\nDo you want to overwrite the password? (y/n): ")
+        if account_overwrite.lower() == 'y':
+            print(f"\n-- The password for \"{account_name}\" account, was updated successfully. --")
         else:
-            passfile_save(account_name)
-            print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
+            print("-- Back to menu... --")    
+    else:
+        passfile_save(account_name + ':' + password_generator() + "\n")
+        print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --") 
+
+
+#def account_manager2(account_name): # Saves account name and password
+
+#    pass
+    # get_password = passfile_read()
+    # if get_password:
+    #     if account_name in get_password: # password existe
+    #         account_overwrite = input("\n-- The account name you entered already exist. --\nDo you want to overwrite the password? (y/n): ")
+
+    #         if account_overwrite.lower() == 'y':
+    #             passfile_overwrite(account_name, True)
+    #             print(f"\n-- The password for \"{account_name}\" account, was updated successfully. --")
+    
+    #         else:
+    #             print("-- Back to menu... --")
+    #     else:
+    #         passfile_save(account_name)
+    #         print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
         
    
-    else:
-        account = account_name + password_generator() + '\n'
-        passfile_save(account)
-        print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
+    # else:
+    #     account = account_name + password_generator() + '\n'
+    #     passfile_save(account)
+    #     print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
 
 
 
@@ -119,12 +142,11 @@ while (True):
  
     elif main_menu_option == '2':
         account_name = input("\n-- Get generated password. --\nPlease enter the name of the account to display the password: ")
-        get_password = passfile_overwrite(account_name, False)
-        if get_password: 
-            print(f"\nThe password is: {get_password}")
+        password = password_exist(account_name)
+        if password:
+            print(f"\nThe password for '{account_name}' account {password}")
         else:
             print(f"\nThe account \"{account_name}\" is not registered.")
-
 
     elif main_menu_option =='3':
         print("\n-- Thanks for using this software. Bye! --\n\n")
