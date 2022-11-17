@@ -100,34 +100,6 @@ def account_manager(account_name):
         print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --") 
 
 
-#def account_manager2(account_name): # Saves account name and password
-
-#    pass
-    # get_password = passfile_read()
-    # if get_password:
-    #     if account_name in get_password: # password existe
-    #         account_overwrite = input("\n-- The account name you entered already exist. --\nDo you want to overwrite the password? (y/n): ")
-
-    #         if account_overwrite.lower() == 'y':
-    #             passfile_overwrite(account_name, True)
-    #             print(f"\n-- The password for \"{account_name}\" account, was updated successfully. --")
-    
-    #         else:
-    #             print("-- Back to menu... --")
-    #     else:
-    #         passfile_save(account_name)
-    #         print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
-        
-   
-    # else:
-    #     account = account_name + password_generator() + '\n'
-    #     passfile_save(account)
-    #     print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
-
-
-
-
-
 while (True):
 
     main_menu_option = main_menu()
