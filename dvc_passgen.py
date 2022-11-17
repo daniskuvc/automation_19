@@ -1,85 +1,133 @@
-# Password Generator by Daniel Villarroel Chanlopkova
-# passgen v.1.0
+# Password Generator by DVC
 
-#password = "" # chars > 8 and chars <= 16
-              # at least one capital letter (ASDDFG)
-              # At least one number (0 - 9)
-              # at least one lower letter
+import random, re, os
+from io import open
 
-import random, re
+PATH_FILE = os.path.join(os.getcwd(), 'passlist.txt')
 
-pass_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
-pass_chars_len=len(pass_chars)
-pass_len = random.randint(9, 16)
-
-def password_generator():
+def password_generator(): #Returns a string with a randonmly generated password
+    pass_chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz"
+    pass_chars_len=len(pass_chars)
+    pass_len = random.randint(9, 16)
     password=""
+    
     for i in range(pass_len):
         password += pass_chars[random.randint(0, pass_chars_len-1)]
 
     if not re.search(r'[0-9][A-Z][a-z]', password):
-        password_generator()
+        password = password_generator()
 
     return password
 
-password_list={}
 
-def create_account_password(account_name):
-    if not password_list.get(account_name):
-        print(f"\nThe password for \"{account_name}\" account, was generated successfully.")
-        password_list[account_name] = password_generator()
+def main_menu(): #Displays main menu options and returns selected option
+    
+    return input("""\n
+    ---------------------------------
+    Password Generator v2.0
+    ---------------------------------
+    1) Generate password
+    2) Get generated password
+    3) Exit
+    
+    Please, select an option: """)
+    
+def passfile_save(text_to_save):
+    file = open(PATH_FILE,'a+')
+    #save_pass = account_name + ':' + password_generator() + "\n"
+    #file.write(save_pass)
+    file.write(text_to_save)
+    file.close()
+
+def passfile_read():
+    #print(os.getcwd(),os.path.exists(PATH_FILE),PATH_FILE)
+    if not os.path.exists(PATH_FILE):
+        return ""
     else:
-        while (True):
-            account_name_choice = input("""\nThe account name you entered already exist.
-            \tWhat do you want to do?
-            \t1) Update existing password
-            \t2) New account and password
-            \t3) Back to Main Menu
-            Please, select an option:_ """)
+        file = open(PATH_FILE,'r+')
+        password_list = file.read()
+        file.close()
+    print(password_list, "check")
 
-            if account_name_choice == '1':
-                print(f"\nThe password for \"{account_name}\" account, was updated successfully.")
-                password_list[account_name] = password_generator()
+    return password_list
 
-            elif account_name_choice == '2':
-                print("\n2) New account and password.\nPlease enter the name of the account to generate the password:_ ")
-                account_name = input("\n2) New account and password.\nPlease enter the name of the account to generate the password: ")
-                create_account_password(account_name)
-            elif account_name_choice == '3':
-                break
+def passfile_overwrite(account_name, overwrite):
+    print(os.path.exists(PATH_FILE))
+    if not os.path.exists(PATH_FILE):
+        return ""
+    else:
+        file = open(PATH_FILE,'r+')
+        pass_lines = file.readlines()
+        
+        for line, account in enumerate(pass_lines):
+            if account_name in account:
+                if overwrite:
+                    print(pass_lines[line].split(':')[1])
+                    pass_lines[line].split(':')[1] = password_generator() + '\n'
+                    break
+                else:
+                    return account
+                
             else:
-                print("Back to menu...")
+                return False
+        file.seek(0)
+        file.writelines(pass_lines) 
+        file.close()
 
-#print(password_generator())
+
+
+
+
+
+def account_manager(account_name): # Saves account name and password 
+    get_password = passfile_read()
+    if get_password:
+        if account_name in get_password: # password existe
+            account_overwrite = input("\n-- The account name you entered already exist. --\nDo you want to overwrite the password? (y/n): ")
+
+            if account_overwrite.lower() == 'y':
+                passfile_overwrite(account_name, True)
+                print(f"\n-- The password for \"{account_name}\" account, was updated successfully. --")
+    
+            else:
+                print("-- Back to menu... --")
+        else:
+            passfile_save(account_name)
+            print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
+        
+   
+    else:
+        account = account_name + password_generator() + '\n'
+        passfile_save(account)
+        print(f"\n-- The password for \"{account_name}\" account, was generated successfully. --")
+
+
+
+
 
 while (True):
-    print("\n" + "-"*20)
-    print("Password Generator by DVC")
-    print("-"*20 + "\n")
-    print("""\tMain Menu:
-    \t1) Generate password
-    \t2) Get generated password
-    \t3) Exit""")
-    main_menu_option = input("Please, select an option:_ ")
+
+    main_menu_option = main_menu()
+    
     if main_menu_option == '1':
-        account_name = input("\n1) Generate password.\nPlease enter the name of the account to generate the password or type 'back()' to back to previous menu: ")
+        account_name = input("\n-- Generating password. --\nEnter account name: ")
         
-        if account_name.lower() == "back()".lower() or not account_name:
-            print("Back to menu...")
+        if not account_name:
+            print("\nNothing entered.")
         else:
-            create_account_password(account_name)
+            account_manager(account_name)
  
     elif main_menu_option == '2':
-        get_password = input("\n2) Get generated password.\nPlease enter the name of the account to display the password: ")
-
-        if get_password and password_list.get(get_password) and password_list: 
-            print(f"\nThe password for {get_password} is {password_list.get(get_password)}")
+        account_name = input("\n-- Get generated password. --\nPlease enter the name of the account to display the password: ")
+        get_password = passfile_overwrite(account_name, False)
+        if get_password: 
+            print(f"\nThe password is: {get_password}")
         else:
-            print(f"\nThe account \"{get_password}\" does not exist.")
+            print(f"\nThe account \"{account_name}\" is not registered.")
 
 
     elif main_menu_option =='3':
-        print("\nThanks for using this software. Bye!\n\n")
+        print("\n-- Thanks for using this software. Bye! --\n\n")
         break
     else:
-        print("\nInvalid option. Please provide a number between 1 and 3.\n")    
+        print("\n-- Invalid option. Please provide a number between 1 and 3. --\n")    
